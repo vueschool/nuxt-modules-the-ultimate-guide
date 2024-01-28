@@ -6,6 +6,9 @@
 import { onMounted } from "vue";
 
 onMounted(() => {
-  console.log("TEST");
+  console.log(
+    "Show me the module options : ",
+    useRuntimeConfig().public.basicOptimizer
+  );
 });
 </script>
