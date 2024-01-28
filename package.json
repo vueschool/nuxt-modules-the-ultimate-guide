@@ -1,8 +1,8 @@
 {
-  "name": "my-module",
+  "name": "nuxt-basic-optimizer",
   "version": "1.0.0",
-  "description": "My new Nuxt module",
-  "repository": "your-org/my-module",
+  "description": "A collection of nuxt optimization options",
+  "repository": "MooseSaeed/nuxt-basic-optimizer",
   "license": "MIT",
   "type": "module",
   "exports": {

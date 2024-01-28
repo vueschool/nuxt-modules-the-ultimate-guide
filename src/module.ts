@@ -1,19 +1,25 @@
-import { defineNuxtModule, addPlugin, createResolver } from '@nuxt/kit'
+import { defineNuxtModule } from "@nuxt/kit";
 
-// Module options TypeScript interface definition
 export interface ModuleOptions {}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: 'my-module',
-    configKey: 'myModule'
+    name: "nuxt-basic-optimizer",
+    configKey: "basicOptimizer",
   },
-  // Default configuration options of the Nuxt module
-  defaults: {},
-  setup (options, nuxt) {
-    const resolver = createResolver(import.meta.url)
 
-    // Do not add the extension since the `.ts` will be transpiled to `.mjs` after `npm run prepack`
-    addPlugin(resolver.resolve('./runtime/plugin'))
-  }
-})
+  defaults: {},
+  setup(options, nuxt) {
+    const nuxtOptions = nuxt.options;
+
+    nuxtOptions.vite.esbuild ||= {};
+    nuxtOptions.vite.esbuild.pure ||= [];
+    nuxtOptions.vite.esbuild.pure.push("console.log");
+
+    nuxtOptions.nitro.compressPublicAssets = true;
+
+    nuxtOptions.nitro.minify = true;
+
+    nuxtOptions.experimental.defaults.useAsyncData.deep = false;
+  },
+});
