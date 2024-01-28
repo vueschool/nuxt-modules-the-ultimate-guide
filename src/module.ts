@@ -1,77 +1,48 @@
-import { defineNuxtModule } from "@nuxt/kit";
-import { defu } from "defu";
+import { defineNuxtModule, createResolver } from "@nuxt/kit";
 
-// Module options TypeScript interface definition
-export interface ModuleOptions {
-  dropConsole: boolean;
-  nitroCompressAssets: boolean;
-  nitroMinify: boolean;
-  disableDeepUseAsyncData: boolean;
-  manualChunks: {
-    [key: string]: string[];
-  };
-}
-
-export default defineNuxtModule<ModuleOptions>({
+export default defineNuxtModule({
   meta: {
-    name: "nuxt-basic-optimizer",
-    configKey: "basicOptimizer",
+    name: "my-module",
+    configKey: "myModule",
+    compatibility: {
+      nuxt: "^3.0.0",
+    },
   },
-  // Default configuration options of the Nuxt module
-  defaults: {
-    dropConsole: true,
-    nitroCompressAssets: true,
-    nitroMinify: true,
-    disableDeepUseAsyncData: true,
-    manualChunks: {},
+  hooks: {
+    "nitro:config": (nitroConfig) => {
+      const { resolve } = createResolver(import.meta.url);
+
+      nitroConfig.publicAssets ||= [];
+      nitroConfig.publicAssets.push({
+        dir: resolve("./runtime/images"),
+        maxAge: 60 * 60 * 24 * 365,
+      });
+
+      console.log(resolve("./runtime/images"));
+    },
   },
-
-  hooks: {},
-  setup(options, nuxt) {
-    const nuxtOptions = nuxt.options;
-
-    const moduleOptions: ModuleOptions = defu(
-      nuxtOptions.runtimeConfig.public.basicOptimizer || {},
+  setup(moduleOptions, nuxt) {
+    const links = [
       {
-        ...options,
-      }
-    );
+        rel: "preconnect",
+        href: "https://fonts.googleapis.com",
+      },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@1,900&display=swap",
+      },
+    ];
 
-    nuxtOptions.runtimeConfig.public.basicOptimizer = moduleOptions;
-
-    nuxt.hook("vite:extendConfig", (viteConfig, env) => {
-      if (moduleOptions.dropConsole) {
-        viteConfig.esbuild ||= {};
-        viteConfig.esbuild.pure ||= [];
-        viteConfig.esbuild.pure.push("console.log");
-      }
+    links.forEach((link) => {
+      nuxt.options.app.head.link?.push(link);
     });
 
-    nuxt.hook("nitro:config", (nitroConfig) => {
-      if (moduleOptions.nitroCompressAssets)
-        nitroConfig.compressPublicAssets = true;
+    const { resolve } = createResolver(import.meta.url);
 
-      if (moduleOptions.nitroMinify) nitroConfig.minify = true;
-    });
-
-    nuxt.hook("vite:extendConfig", (config, { isClient }) => {
-      const chunks = Object.entries(moduleOptions.manualChunks);
-      if (!chunks.length || !isClient || process.env.NODE_ENV !== "production")
-        return;
-
-      // @ts-ignore
-      config.build.rollupOptions.output.manualChunks = function (_id: string) {
-        for (const [chunkName, chunkIds] of chunks) {
-          for (const chunkId of chunkIds) {
-            if (_id.includes(chunkId)) {
-              return chunkName;
-            }
-          }
-        }
-      };
-    });
-
-    if (moduleOptions.disableDeepUseAsyncData)
-      nuxtOptions.experimental.defaults.useAsyncData.deep = false;
+    nuxt.options.css.push(resolve("./runtime/roboto.css"));
   },
 });
