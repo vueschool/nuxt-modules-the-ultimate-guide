@@ -1,6 +1,7 @@
 import { defineNuxtModule } from "@nuxt/kit";
 import { defu } from "defu";
 
+// Module options TypeScript interface definition
 export interface ModuleOptions {
   dropConsole: boolean;
   nitroCompressAssets: boolean;
@@ -13,35 +14,43 @@ export default defineNuxtModule<ModuleOptions>({
     name: "nuxt-basic-optimizer",
     configKey: "basicOptimizer",
   },
-
+  // Default configuration options of the Nuxt module
   defaults: {
     dropConsole: true,
     nitroCompressAssets: true,
     nitroMinify: true,
     disableDeepUseAsyncData: true,
   },
+
+  hooks: {},
   setup(options, nuxt) {
     const nuxtOptions = nuxt.options;
 
-    nuxtOptions.runtimeConfig.public.basicOptimizer = defu(
+    const moduleOptions: ModuleOptions = defu(
       nuxtOptions.runtimeConfig.public.basicOptimizer || {},
       {
         ...options,
       }
     );
 
-    if (options.dropConsole) {
-      nuxtOptions.vite.esbuild ||= {};
-      nuxtOptions.vite.esbuild.pure ||= [];
-      nuxtOptions.vite.esbuild.pure.push("console.log");
+    nuxtOptions.runtimeConfig.public.basicOptimizer = moduleOptions;
+
+    if (moduleOptions.dropConsole) {
+      nuxt.hook("vite:extendConfig", (viteConfig, env) => {
+        viteConfig.esbuild ||= {};
+        viteConfig.esbuild.pure ||= [];
+        viteConfig.esbuild.pure.push("console.log");
+      });
     }
 
-    if (options.nitroCompressAssets)
-      nuxtOptions.nitro.compressPublicAssets = true;
+    nuxt.hook("nitro:config", (nitroConfig) => {
+      if (moduleOptions.nitroCompressAssets)
+        nitroConfig.compressPublicAssets = true;
 
-    if (options.nitroMinify) nuxtOptions.nitro.minify = true;
+      if (moduleOptions.nitroMinify) nitroConfig.minify = true;
+    });
 
-    if (options.disableDeepUseAsyncData)
+    if (moduleOptions.disableDeepUseAsyncData)
       nuxtOptions.experimental.defaults.useAsyncData.deep = false;
   },
 });
