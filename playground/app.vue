@@ -3,6 +3,7 @@
     <figure>
       <img src="/vueschool-logo.png" alt="VueSchool Logo" />
     </figure>
+
     <h1>Random Wise Quotes</h1>
 
     <button @click="toggleSortOrder">
@@ -14,22 +15,26 @@
 
     <TransitionGroup name="list" tag="ul">
       <li v-for="quote in sortedQuotes" :key="quote._id">
-        <span>{{ quote.dateAdded }}</span>
-        <blockquote>
-          <p>{{ quote.content }}</p>
-          <cite>- {{ quote.author }}</cite>
-        </blockquote>
+        <CardColored>
+          <template #header>
+            <span>{{ quote.dateAdded }}</span>
+          </template>
+          <template #body>
+            <p>{{ quote.content }}</p>
+            <cite>- {{ quote.author }}</cite>
+          </template>
+        </CardColored>
       </li>
     </TransitionGroup>
   </div>
 
-  <div v-observe-visibility="loadMoreQuotes" class="footer">
+  <div class="footer">
     <p>May the force be with you</p>
   </div>
 </template>
 
 <script setup>
-const { data, refresh, execute } = await useFetch(
+const { data, refresh } = await useFetch(
   "https://api.quotable.io/quotes/random?limit=10",
   {
     deep: false,
@@ -44,14 +49,6 @@ const quotes = ref(data.value);
 const refreshQuotes = async () => {
   await refresh();
   quotes.value = data.value;
-};
-
-const loadMoreQuotes = async (isVisibile, entry) => {
-  if (entry.intersectionRatio > 0) {
-    await execute();
-    const newQuotes = data.value;
-    quotes.value = [...quotes.value, ...newQuotes];
-  }
 };
 
 const sortOrder = ref("desc");

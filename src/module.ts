@@ -1,9 +1,4 @@
-import {
-  defineNuxtModule,
-  addPlugin,
-  addPluginTemplate,
-  createResolver,
-} from "@nuxt/kit";
+import { defineNuxtModule, createResolver, addComponentsDir } from "@nuxt/kit";
 
 export interface ModuleOptions {
   activateObserver: boolean;
@@ -21,37 +16,31 @@ export default defineNuxtModule<ModuleOptions>({
   setup(options, nuxt) {
     const { resolve } = createResolver(import.meta.url);
 
-    const clientPlugin = options.activateObserver
-      ? `import { defineNuxtPlugin } from "#imports";
+    // addComponent({
+    //   name: "CardColored",
+    //   filePath: resolve("./runtime/cards/colored.vue"),
+    //   export: "default",
+    //   chunkName: "",
+    //   prefetch: false,
+    //   preload: false,
+    //   global: false,
+    //   mode: "all",
+    //   priority: 1,
+    //   island: true,
+    // });
 
-export default defineNuxtPlugin(async (nuxtApp) => {
-
-const VueObserveVisibility = await import("vue3-observe-visibility").then(
-(m) => m.default
-);
-
-nuxtApp.vueApp.use(VueObserveVisibility);
-
-});`
-      : `import { defineNuxtPlugin } from "#imports";
-
-export default defineNuxtPlugin(async (nuxtApp) => {
-
-nuxtApp.vueApp.directive("observe-visibility", {});
-
-});`;
-
-    addPluginTemplate({
-      getContents: () => clientPlugin,
-      filename: "observer.mjs",
-      mode: "client",
-      write: true,
-      dst: resolve("./runtime/observer.ts"),
-    });
-
-    addPlugin({
-      src: resolve("./runtime/observer-stub"),
-      mode: "server",
+    addComponentsDir({
+      path: resolve("./runtime/cards"),
+      prefix: "Card",
+      ignore: ["**/*.stories.js"],
+      isAsync: true,
+      extendComponent: (component) => {
+        if (component.pascalName === "CardColored") component.prefetch = true;
+        console.log(component);
+        return component;
+      },
+      global: true,
+      watch: true,
     });
   },
 });

@@ -28,8 +28,7 @@
     "test:watch": "vitest watch"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.9.3",
-    "vue3-observe-visibility": "^1.0.1"
+    "@nuxt/kit": "^3.9.3"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",

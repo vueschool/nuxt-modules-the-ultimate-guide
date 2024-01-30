@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: [["../src/module", { activateObserver: false }]],
+  modules: ["../src/module"],
 
   devtools: { enabled: true },
 });
