@@ -1,10 +1,4 @@
-import {
-  defineNuxtModule,
-  createResolver,
-  addImports,
-  addImportsSources,
-  addImportsDir,
-} from "@nuxt/kit";
+import { defineNuxtModule, createResolver, extendPages } from "@nuxt/kit";
 
 export interface ModuleOptions {
   activateObserver: boolean;
@@ -22,26 +16,12 @@ export default defineNuxtModule<ModuleOptions>({
   setup(options, nuxt) {
     const { resolve } = createResolver(import.meta.url);
 
-    // addImports([
-    //   {
-    //     name: "renderToString",
-    //     as: "renderToStr",
-    //     from: "vue/server-renderer",
-    //   },
-    //   {
-    //     name: "renderToNodeStream",
-    //     as: "renderToNodeStream",
-    //     from: "vue/server-renderer",
-    //   },
-    // ]);
-
-    // addImportsSources({
-    //   from: "vue/server-renderer",
-    //   imports: ["renderToString", "renderToNodeStream"],
-    // });
-
-    addImportsDir(resolve("./runtime/composables"), {
-      prepend: true,
+    extendPages((pages) => {
+      pages.push({
+        name: "courses-pagination",
+        file: resolve("./runtime/pages/pagination.vue"),
+        path: "/courses/:page",
+      });
     });
   },
 });

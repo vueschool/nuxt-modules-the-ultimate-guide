@@ -1,5 +1,5 @@
 <template>
-  <div>Nuxt module playground!</div>
+  <div><NuxtPage /></div>
 </template>
 
 <script setup></script>
