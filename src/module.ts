@@ -1,4 +1,10 @@
-import { defineNuxtModule, createResolver, addComponentsDir } from "@nuxt/kit";
+import {
+  defineNuxtModule,
+  createResolver,
+  addImports,
+  addImportsSources,
+  addImportsDir,
+} from "@nuxt/kit";
 
 export interface ModuleOptions {
   activateObserver: boolean;
@@ -16,31 +22,26 @@ export default defineNuxtModule<ModuleOptions>({
   setup(options, nuxt) {
     const { resolve } = createResolver(import.meta.url);
 
-    // addComponent({
-    //   name: "CardColored",
-    //   filePath: resolve("./runtime/cards/colored.vue"),
-    //   export: "default",
-    //   chunkName: "",
-    //   prefetch: false,
-    //   preload: false,
-    //   global: false,
-    //   mode: "all",
-    //   priority: 1,
-    //   island: true,
+    // addImports([
+    //   {
+    //     name: "renderToString",
+    //     as: "renderToStr",
+    //     from: "vue/server-renderer",
+    //   },
+    //   {
+    //     name: "renderToNodeStream",
+    //     as: "renderToNodeStream",
+    //     from: "vue/server-renderer",
+    //   },
+    // ]);
+
+    // addImportsSources({
+    //   from: "vue/server-renderer",
+    //   imports: ["renderToString", "renderToNodeStream"],
     // });
 
-    addComponentsDir({
-      path: resolve("./runtime/cards"),
-      prefix: "Card",
-      ignore: ["**/*.stories.js"],
-      isAsync: true,
-      extendComponent: (component) => {
-        if (component.pascalName === "CardColored") component.prefetch = true;
-        console.log(component);
-        return component;
-      },
-      global: true,
-      watch: true,
+    addImportsDir(resolve("./runtime/composables"), {
+      prepend: true,
     });
   },
 });
