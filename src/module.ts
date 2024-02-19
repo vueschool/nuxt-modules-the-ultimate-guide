@@ -1,4 +1,10 @@
-import { defineNuxtModule, createResolver, extendPages } from "@nuxt/kit";
+import {
+  defineNuxtModule,
+  createResolver,
+  extendPages,
+  extendRouteRules,
+  addRouteMiddleware,
+} from "@nuxt/kit";
 
 export interface ModuleOptions {
   activateObserver: boolean;
@@ -22,6 +28,14 @@ export default defineNuxtModule<ModuleOptions>({
         file: resolve("./runtime/pages/pagination.vue"),
         path: "/courses/:page",
       });
+    });
+
+    extendRouteRules("/courses/**", { static: true });
+
+    addRouteMiddleware({
+      name: "redirector",
+      path: resolve("runtime/redirector.ts"),
+      global: true,
     });
   },
 });
