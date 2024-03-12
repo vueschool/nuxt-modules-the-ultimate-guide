@@ -1,14 +1,6 @@
-import {
-  defineNuxtModule,
-  createResolver,
-  extendPages,
-  extendRouteRules,
-  addRouteMiddleware,
-} from "@nuxt/kit";
+import { defineNuxtModule, createResolver, addServerHandler } from "@nuxt/kit";
 
-export interface ModuleOptions {
-  activateObserver: boolean;
-}
+export interface ModuleOptions {}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -22,20 +14,9 @@ export default defineNuxtModule<ModuleOptions>({
   setup(options, nuxt) {
     const { resolve } = createResolver(import.meta.url);
 
-    extendPages((pages) => {
-      pages.push({
-        name: "courses-pagination",
-        file: resolve("./runtime/pages/pagination.vue"),
-        path: "/courses/:page",
-      });
-    });
-
-    extendRouteRules("/courses/**", { static: true });
-
-    addRouteMiddleware({
-      name: "redirector",
-      path: resolve("runtime/redirector.ts"),
-      global: true,
+    addServerHandler({
+      handler: resolve("./runtime/server/middleware/authMiddleware.ts"),
+      route: "/test",
     });
   },
 });
