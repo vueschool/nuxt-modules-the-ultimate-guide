@@ -1,4 +1,11 @@
-import { defineNuxtModule, createResolver, addServerHandler } from "@nuxt/kit";
+import {
+  defineNuxtModule,
+  createResolver,
+  addServerHandler,
+  addPrerenderRoutes,
+  addServerImportsDir,
+  addServerScanDir,
+} from "@nuxt/kit";
 
 export interface ModuleOptions {}
 
@@ -18,5 +25,11 @@ export default defineNuxtModule<ModuleOptions>({
       handler: resolve("./runtime/server/middleware/authMiddleware.ts"),
       route: "/test",
     });
+
+    addPrerenderRoutes("/test");
+
+    addServerImportsDir(resolve("./runtime/utils"));
+
+    addServerScanDir(resolve("./runtime/server"));
   },
 });
