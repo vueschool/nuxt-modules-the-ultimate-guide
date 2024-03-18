@@ -1,4 +1,11 @@
-import { defineNuxtModule, addServerPlugin, createResolver } from "@nuxt/kit";
+import {
+  defineNuxtModule,
+  addServerPlugin,
+  createResolver,
+  extendViteConfig,
+  addVitePlugin,
+} from "@nuxt/kit";
+import svgLoader from "vite-svg-loader";
 import { defu } from "defu";
 
 export interface ModuleOptions {
@@ -27,11 +34,11 @@ export default defineNuxtModule<ModuleOptions>({
   async setup(options, nuxt) {
     const nuxtOptions = nuxt.options;
 
-    if (options.dropConsole) {
-      nuxtOptions.vite.esbuild ||= {};
-      nuxtOptions.vite.esbuild.pure ||= [];
-      nuxtOptions.vite.esbuild.pure.push("console.log");
-    }
+    extendViteConfig((config) => {
+      config.esbuild ||= {};
+      config.esbuild.pure ||= [];
+      config.esbuild.pure.push("console.log");
+    });
 
     if (options.nitroCompressAssets)
       nuxtOptions.nitro.compressPublicAssets = true;
@@ -71,5 +78,7 @@ export default defineNuxtModule<ModuleOptions>({
       const { resolve } = createResolver(import.meta.url);
       addServerPlugin(resolve("runtime/compressor.ts"));
     }
+
+    addVitePlugin(svgLoader());
   },
 });
